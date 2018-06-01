@@ -107,3 +107,4 @@ RUN apt-get update \
 ENV COMPOSER_HOME /root/composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 ENV PATH $COMPOSER_HOME/vendor/bin:$PATH
+RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
