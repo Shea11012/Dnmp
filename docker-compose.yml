@@ -51,3 +51,11 @@ services:
     volumes: 
       - ./redis/:/data
     restart: always
+
+  node:
+    build: ./conf/node/
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./www/:/var/www/html/:rw
+    tty: true
