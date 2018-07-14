@@ -1,4 +1,4 @@
-ALTER USER 'zhuzi' IDENTITY WITH mysql_native_password;
+ALTER USER 'zhuzi' IDENTIFIED WITH mysql_native_password BY '123456';
 
 GRANT ALL ON *.* TO 'zhuzi'@'%';
 
