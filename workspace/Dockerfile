@@ -3,7 +3,7 @@ FROM laradock/workspace:2.2-7.2
 USER root
 
 # add a non-root user
-ARG PUID=1000
+ARG PUID=1001
 ENV PUID=${PUID}
 ARG PGID=1000
 ENV PGID=${PGID}
