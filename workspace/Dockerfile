@@ -9,10 +9,10 @@ ARG PGID=1000
 ENV PGID=${PGID}
 
 RUN apt-get update -yqq && \
-    pecl channel-update pecl.php.net && \
-    groupadd -g ${PGID} dnmp && \
-    useradd -u ${PUID} -g dnmp -m dnmp -G docker_env && \
-    usermod -p "*" dnmp
+	pecl channel-update pecl.php.net && \
+	groupadd -g ${PGID} dnmp && \
+	useradd -u ${PUID} -g dnmp -m dnmp -G docker_env && \
+	usermod -p "*" dnmp
 
 # set Timezone
 ARG TZ=Asia/Shanghai
@@ -32,13 +32,13 @@ USER dnmp
 
 RUN composer global install
 
-ARG COMPOSER_REPO_PACKAGIST=https://packagist.phpcomposer.com
+ARG COMPOSER_REPO_PACKAGIST=https://laravel-china.org/composer
 ENV COMPOSER_REPO_PACKAGIST ${COMPOSER_REPO_PACKAGIST}
 
 RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
 RUN echo "" >> ~/.bashrc && \
-    echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
+	echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 
 
 
@@ -50,28 +50,28 @@ ENV NPM_REGISTRY ${NPM_REGISTRY}
 ENV NVM_DIR /home/dnmp/.nvm
 
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash \
-        && . $NVM_DIR/nvm.sh \
-        && nvm install ${NODE_VERSION} \
-        && nvm alias default ${NODE_VERSION} \
-        && nvm use default \
-        && npm config set registry ${NPM_REGISTRY}
+	&& . $NVM_DIR/nvm.sh \
+	&& nvm install ${NODE_VERSION} \
+	&& nvm alias default ${NODE_VERSION} \
+	&& nvm use default \
+	&& npm config set registry ${NPM_REGISTRY}
 
 RUN echo "" >> ~/.bashrc && \
-    echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc && \
-    echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
+	echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc && \
+	echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
 USER root
 
 RUN echo "" >> ~/.bashrc && \
-    echo 'export NVM_DIR="/home/dnmp/.nvm"' >> ~/.bashrc && \
-    echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
+	echo 'export NVM_DIR="/home/dnmp/.nvm"' >> ~/.bashrc && \
+	echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
 ENV PATH $PATH:$NVM_DIR/versions/node/v${NODE_VERSION}/bin
 
 RUN . ~/.bashrc && npm config set registry ${NPM_REGISTRY}
 
 RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm /var/log/lastlog /var/log/faillog
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+	rm /var/log/lastlog /var/log/faillog
 
 WORKDIR /var/www

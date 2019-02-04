@@ -1,0 +1,7 @@
+data/
+logs/nginx/
+logs/php/
+www/
+nginx/sites/
+!nginx/sites/default.conf
+!nginx/sites/defaultSSL.conf.example
