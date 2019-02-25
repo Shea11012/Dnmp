@@ -97,3 +97,20 @@ services:
       - php-fpm
     networks:
       - backend
+  #### elasticsearch
+  elasticsearch:
+    build: ./elasticsearch
+    volumes:
+      - ${DATA_PATH_HOST}/elasticsearch:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    depends_on:
+      - php-fpm
+    networks:
+      - frontend
+      - backend
