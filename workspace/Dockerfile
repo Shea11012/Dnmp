@@ -32,7 +32,7 @@ USER dnmp
 
 RUN composer global install
 
-ARG COMPOSER_REPO_PACKAGIST=https://laravel-china.org/composer
+ARG COMPOSER_REPO_PACKAGIST=https://packagist.laravel-china.org
 ENV COMPOSER_REPO_PACKAGIST ${COMPOSER_REPO_PACKAGIST}
 
 RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}

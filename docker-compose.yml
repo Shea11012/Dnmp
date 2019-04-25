@@ -67,14 +67,14 @@ services:
       - backend
 
   #### MongoDB ######
-  mongo:
-    build: ./mongo
-    ports:
-      - "${MONGODB_PORT}:27017"
-    volumes:
-      - ${DATA_PATH_HOST}/mongo:/data/db
-    networks:
-      - backend
+  # mongo:
+  #   build: ./mongo
+  #   ports:
+  #     - "${MONGODB_PORT}:27017"
+  #   volumes:
+  #     - ${DATA_PATH_HOST}/mongo:/data/db
+  #   networks:
+  #     - backend
 
   #### Redis ######
   redis:
@@ -102,6 +102,10 @@ services:
     build: ./elasticsearch
     volumes:
       - ${DATA_PATH_HOST}/elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - cluster.name=dnmp-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
@@ -114,3 +118,14 @@ services:
     networks:
       - frontend
       - backend
+  ###### swoole
+  swoole:
+    build: ./swoole
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+    depends_on:
+      - workspace
+    networks:
+      - backend
+    tty: true
+    entrypoint: ["bash"]

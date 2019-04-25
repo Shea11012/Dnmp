@@ -9,6 +9,7 @@ COPY ./sources.list.stretch /etc/apt/sources.list
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 	curl \
+	libcurl4-gnutls-dev \
 	libmemcached-dev \
 	libz-dev \
 	libpq-dev \
@@ -27,13 +28,15 @@ RUN pecl install redis \
 RUN pecl install memcached \
 	&& docker-php-ext-enable memcached
 
-# PHP swoole Extension
-RUN pecl install swoole \
-	&& docker-php-ext-enable swoole
-
 # PHP mongo Extension
 RUN pecl install mongodb && \
 	docker-php-ext-enable mongodb
+
+RUN pecl install msgpack \
+	&& docker-php-ext-enable msgpack
+
+RUN pecl install yar \
+	&& docker-php-ext-enable yar
 
 
 # Opcache
@@ -82,4 +85,4 @@ WORKDIR /var/www
 
 CMD ["php-fpm"]
 
-EXPOSE 9000 9501
+EXPOSE 9000
