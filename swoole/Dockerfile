@@ -33,7 +33,7 @@ RUN curl -sS https://getcomposer.org/installer | php \
 
 USER dnmp
 
-RUN composer config -g repo.packagist composer https://packagist.laravel-china.org
+RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 USER root
 # PDO extension
