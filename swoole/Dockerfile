@@ -1,27 +1,29 @@
 FROM php:7.3
 
 # Version
-ENV PHPREDIS_VERSION 4.0.0
-ENV HIREDIS_VERSION 0.13.3
-ENV SWOOLE_VERSION 4.3.1
+ARG PHPREDIS_VERSION=4.0.0
+ARG	HIREDIS_VERSION=0.14.0
+ARG	SWOOLE_VERSION=4.4.1
+ARG	TIMEZONE=Asia/Shanghai
+
+ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 
 # Timezone
-RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-	&& echo 'Asia/Shanghai' > /etc/timezone
+RUN /bin/cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+	&& echo ${TIMEZONE} > /etc/timezone
 
 # Libs
 RUN apt-get update \
 	&& apt-get install -y \
-	curl \
-	wget \
-	git \
-	zip \
+	curl wget git zip unzip less vim openssl \
 	libz-dev \
+	libzip-dev \
 	libssl-dev \
 	libnghttp2-dev \
 	libpcre3-dev \
-	&& apt-get clean \
-	&& apt-get autoremove \
+	libjpeg-dev \
+	libpng-dev \
+	libfreetype6-dev \
 	&& groupadd -g 1000 dnmp \
 	&& useradd -u 1000 -g dnmp -m dnmp \
 	&& usermod -p "*" dnmp
@@ -33,14 +35,12 @@ RUN curl -sS https://getcomposer.org/installer | php \
 
 USER dnmp
 
-RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
 USER root
-# PDO extension
-RUN docker-php-ext-install pdo_mysql
-
-# Bcmath extension
-RUN docker-php-ext-install bcmath
+# PHP extension
+RUN docker-php-ext-install \
+	bcmath gd pdo_mysql mbstring sockets zip sysvmsg sysvsem sysvshm
 
 # Redis extension
 RUN wget http://pecl.php.net/get/redis-${PHPREDIS_VERSION}.tgz -O /tmp/redis.tar.tgz \
@@ -75,6 +75,9 @@ RUN wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz 
 	) \
 	&& rm -r swoole \
 	&& docker-php-ext-enable swoole
+
+RUN apt-get clean \
+	&& apt-get purge -y --auto-remove -o APT::AutoRemvoe::RecommendsImportant=false
 
 WORKDIR /var/www
 

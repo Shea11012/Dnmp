@@ -99,7 +99,7 @@ services:
       - backend
   #### elasticsearch
   elasticsearch:
-    build: ./elasticsearch
+    image: shea11012/mxy:elasticsearch
     volumes:
       - ${DATA_PATH_HOST}/elasticsearch:/usr/share/elasticsearch/data
     environment:

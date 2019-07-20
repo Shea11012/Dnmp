@@ -10,8 +10,10 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories
 
 RUN apk update \
 	&& apk upgrade \
-	&& apk add --no-cache bash \
-	&& adduser -D -H -u 1000 -s /bin/bash www-data
+	&& apk add --no-cache bash
+RUN set -x ;\
+	addgroup -g 82 -S www-data ;\
+	adduser -D -S -u 82 -G www-data www-data && exit 0 ; exit1
 
 CMD ["nginx"]
 
