@@ -8,39 +8,24 @@ COPY ./sources.list.stretch /etc/apt/sources.list
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
-	curl \
-	libcurl4-gnutls-dev \
-	libmemcached-dev \
-	libz-dev \
-	libpq-dev \
-	libjpeg-dev \
-	libpng-dev \
-	libfreetype6-dev \
-	libssl-dev \
-	libmcrypt-dev \
-	libzip-dev
-
+	curl libcurl4-gnutls-dev libmemcached-dev libz-dev libpq-dev \
+	libjpeg-dev libpng-dev libfreetype6-dev libssl-dev libmcrypt-dev \
+	libzip-dev \
 # PHP Redis Extension
-RUN pecl install redis \
-	&& docker-php-ext-enable redis
-
+	&& pecl install redis \
+	&& docker-php-ext-enable redis \
 # PHP Memcache Extension
-RUN pecl install memcached \
-	&& docker-php-ext-enable memcached
-
+	&& pecl install memcached \
+	&& docker-php-ext-enable memcached \
 # PHP mongo Extension
-RUN pecl install mongodb && \
-	docker-php-ext-enable mongodb
-
-RUN pecl install msgpack \
-	&& docker-php-ext-enable msgpack
-
-RUN pecl install yar \
-	&& docker-php-ext-enable yar
-
-
+	&& pecl install mongodb \
+	&& docker-php-ext-enable mongodb \
+	&& pecl install msgpack \
+	&& docker-php-ext-enable msgpack \
+	&& pecl install yar \
+	&& docker-php-ext-enable yar \
 # Opcache
-RUN docker-php-ext-install opcache
+	&& docker-php-ext-install opcache
 
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
@@ -75,11 +60,10 @@ RUN apt-get update \
 
 COPY ./www.conf /usr/local/etc/php-fpm.d/
 
-RUN apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-	rm /var/log/lastlog /var/log/faillog
-
-RUN usermod -u 1000 www-data
+RUN apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+	&& rm /var/log/lastlog /var/log/faillog \
+	&& usermod -u 1000 www-data
 
 WORKDIR /var/www
 

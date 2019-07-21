@@ -8,19 +8,26 @@ ENV PUID=${PUID}
 ARG PGID=1000
 ENV PGID=${PGID}
 
-RUN apt-get update -yqq && \
-	pecl channel-update pecl.php.net && \
-	groupadd -g ${PGID} dnmp && \
-	useradd -u ${PUID} -g dnmp -m dnmp -G docker_env && \
-	usermod -p "*" dnmp
-
 # set Timezone
 ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
 
-RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+# Node /NVM
+ARG NODE_VERSION=node
+ENV NODE_VERSION ${NODE_VERSION}
+ARG NPM_REGISTRY=https://registry.npm.taobao.org
+ENV NPM_REGISTRY ${NPM_REGISTRY}
+ENV NVM_DIR /home/dnmp/.nvm
 
-# composer
+# composer 
+ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
+
+RUN apt-get update -yqq \
+	&& pecl channel-update pecl.php.net \
+	&& groupadd -g ${PGID} dnmp \
+	&& useradd -u ${PUID} -g dnmp -m dnmp -G docker_env \
+	&& usermod -p "*" dnmp \
+	&& ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
 USER root
 
@@ -30,47 +37,32 @@ RUN chown -R dnmp:dnmp /home/dnmp/.composer
 
 USER dnmp
 
-RUN composer global install
-
-ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
-
-RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
-
-RUN echo "" >> ~/.bashrc && \
-	echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
-
-
-
-# Node /NVM
-ARG NODE_VERSION=node
-ENV NODE_VERSION ${NODE_VERSION}
-ARG NPM_REGISTRY=https://registry.npm.taobao.org
-ENV NPM_REGISTRY ${NPM_REGISTRY}
-ENV NVM_DIR /home/dnmp/.nvm
+RUN composer global install \
+	&& composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST} \
+	&& echo "" >> ~/.bashrc \
+	&& echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash \
 	&& . $NVM_DIR/nvm.sh \
 	&& nvm install ${NODE_VERSION} \
 	&& nvm alias default ${NODE_VERSION} \
 	&& nvm use default \
-	&& npm config set registry ${NPM_REGISTRY}
-
-RUN echo "" >> ~/.bashrc && \
-	echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc && \
-	echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
+	&& npm config set registry ${NPM_REGISTRY} \
+	&& echo "" >> ~/.bashrc \
+	&& echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc \
+	&& echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
 USER root
 
-RUN echo "" >> ~/.bashrc && \
-	echo 'export NVM_DIR="/home/dnmp/.nvm"' >> ~/.bashrc && \
-	echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
+RUN echo "" >> ~/.bashrc \
+	&& echo 'export NVM_DIR="/home/dnmp/.nvm"' >> ~/.bashrc \
+	&& echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
 ENV PATH $PATH:$NVM_DIR/versions/node/v${NODE_VERSION}/bin
 
-RUN . ~/.bashrc && npm config set registry ${NPM_REGISTRY}
-
-RUN apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-	rm /var/log/lastlog /var/log/faillog
+RUN . ~/.bashrc && npm config set registry ${NPM_REGISTRY} \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+	&& rm /var/log/lastlog /var/log/faillog
 
 WORKDIR /var/www

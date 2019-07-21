@@ -6,14 +6,13 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezo
 
 COPY ./nginx.conf /etc/nginx/
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories
-
-RUN apk update \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories \
+	&& apk update \
 	&& apk upgrade \
-	&& apk add --no-cache bash
-RUN set -x ;\
-	addgroup -g 82 -S www-data ;\
-	adduser -D -S -u 82 -G www-data www-data && exit 0 ; exit1
+	&& apk add --no-cache bash \
+	&& set -x ;\
+	&& addgroup -g 82 -S www-data \
+	&& adduser -D -S -u 82 -G www-data www-data && exit 0 ; exit1
 
 CMD ["nginx"]
 
