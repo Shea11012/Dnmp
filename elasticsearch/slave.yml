@@ -1,0 +1,18 @@
+# 集群名称，让多个节点加入一个集群，就需要使集群名称一致
+cluster.name: docker-cluster
+# 节点名
+node.name: es02
+# 设置为任意 IP 都可以访问
+network.host: 0.0.0.0
+
+bootstrap.memory_lock: true
+
+# 允许跨域
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+
+discovery.seed_hosts: "es-m"
+cluster.initial_master_nodes: 
+  - "es01"
+  - "es02"
+
