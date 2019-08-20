@@ -86,6 +86,7 @@ services:
     networks:
       - backend
 
+
   #### Memcached ######
   memcached:
     build: ./memcached
@@ -97,14 +98,16 @@ services:
       - php-fpm
     networks:
       - backend
+
+
   #### elasticsearch
-  elasticsearch:
-    image: shea11012/mxy:elasticsearch
+  elasticsearch-m:
+    build: ./elasticsearch
+    container_name: es-m
     volumes:
-      - ${DATA_PATH_HOST}/elasticsearch:/usr/share/elasticsearch/data
+      - ${DATA_PATH_HOST}/elasticsearch/master:/usr/share/elasticsearch/data
+      - ./elasticsearch/master.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     environment:
-      - cluster.name=dnmp-cluster
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -118,6 +121,40 @@ services:
     networks:
       - frontend
       - backend
+
+  elasticsearch-s:
+    build: ./elasticsearch
+    container_name: es-s
+    volumes:
+      - ${DATA_PATH_HOST}/elasticsearch/slave:/usr/share/elasticsearch/data
+      - ./elasticsearch/slave.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    depends_on:
+      - php-fpm
+    networks:
+      - frontend
+      - backend
+
+## elasticsearch 可视化工具
+  kibana:
+    image: kibana:7.3.0
+    ports:
+      - "5601:5601"
+    environment:
+      - elasticsearch.hosts=http://es-m:9200
+      - il8n.locale=zh-CN
+    networks:
+      - frontend
+      - backend
+
   ###### swoole
   swoole:
     build: ./swoole

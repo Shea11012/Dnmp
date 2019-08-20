@@ -1,16 +1,16 @@
-FROM php:7.3.1-fpm
+FROM php:7.3.8-fpm
 
 ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-COPY ./sources.list.stretch /etc/apt/sources.list
+COPY ./sources.list /etc/apt/sources.list
 
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-	curl libcurl4-gnutls-dev libmemcached-dev libz-dev libpq-dev \
-	libjpeg-dev libpng-dev libfreetype6-dev libssl-dev libmcrypt-dev \
-	libzip-dev \
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-recommends  \
+libssl-dev libicu-dev libmemcached-dev libz-dev libpq-dev libjpeg-dev libpng-dev libfreetype6-dev \
+libmcrypt-dev libzip-dev zip unzip libxml2-dev libxslt-dev \
+	&& pecl channel-update pecl.php.net \
+	&& apt-get install -yqq \
 # PHP Redis Extension
 	&& pecl install redis \
 	&& docker-php-ext-enable redis \
@@ -22,29 +22,23 @@ RUN apt-get update \
 	&& docker-php-ext-enable mongodb \
 	&& pecl install msgpack \
 	&& docker-php-ext-enable msgpack \
-	&& pecl install yar \
-	&& docker-php-ext-enable yar \
 # Opcache
-	&& docker-php-ext-install opcache
+	&& docker-php-ext-install opcache \
+# xdebug
+	&& pecl install xdebug \
+	&& docker-php-ext-enable xdebug
 
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # mb_string,pdo,zip....
-RUN apt-get update \
-	&& apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
-	&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include/ \
 	&& docker-php-ext-install gd \
-	&& apt-get install -y libicu-dev \
 	&& docker-php-ext-install intl \
-	&& apt-get install -y libxml2-dev \
-	&& apt-get install -y libxslt-dev \
 	&& docker-php-ext-install soap \
 	&& docker-php-ext-install xsl \
 	&& docker-php-ext-install wddx \
-	&& apt-get install -y libbz2-dev \
-	&& docker-php-ext-install bz2 \
 	&& docker-php-ext-install zip \
-	&& docker-php-ext-install pcntl \
 	&& docker-php-ext-install pdo_mysql \
 	&& docker-php-ext-install mysqli \
 	&& docker-php-ext-install mbstring \

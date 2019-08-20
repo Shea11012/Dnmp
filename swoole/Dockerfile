@@ -8,6 +8,8 @@ ARG	TIMEZONE=Asia/Shanghai
 
 ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 
+COPY ./sources.list /etc/apt/sources.list
+
 # Timezone
 RUN /bin/cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 	&& echo ${TIMEZONE} > /etc/timezone
@@ -15,7 +17,7 @@ RUN /bin/cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 # Libs
 RUN apt-get update \
 	&& apt-get install -y \
-	curl wget git zip unzip less vim openssl \
+	curl wget git zip unzip less vim openssl net-tools\
 	libz-dev \
 	libzip-dev \
 	libssl-dev \
@@ -77,6 +79,8 @@ RUN wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz 
 	&& docker-php-ext-enable swoole
 
 RUN apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+	&& rm /var/log/lastlog /var/log/faillog \
 	&& apt-get purge -y --auto-remove -o APT::AutoRemvoe::RecommendsImportant=false
 
 WORKDIR /var/www
