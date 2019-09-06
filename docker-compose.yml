@@ -8,6 +8,7 @@ networks:
 
 services:
   workspace:
+    container_name: workspace
     build:
       context: ./workspace
     volumes:
@@ -19,6 +20,7 @@ services:
 
   #### PHP-FPM ######
   php-fpm:
+    container_name: php-fpm
     build:
       context: ./php-fpm
     volumes:
@@ -34,6 +36,7 @@ services:
 
   #### NGINX Server #####
   nginx:
+    container_name: nginx
     build:
       context: ./nginx
     volumes:
@@ -51,6 +54,7 @@ services:
 
   #### MySQL ########
   mysql:
+    container_name: mysql
     build:
       context: ./mysql
     environment:
@@ -68,6 +72,7 @@ services:
 
   #### MongoDB ######
   # mongo:
+  #   container_name: mongo
   #   build: ./mongo
   #   ports:
   #     - "${MONGODB_PORT}:27017"
@@ -78,6 +83,7 @@ services:
 
   #### Redis ######
   redis:
+    container_name: redis
     build: ./redis
     volumes:
       - ${DATA_PATH_HOST}/redis:/data
@@ -86,9 +92,9 @@ services:
     networks:
       - backend
 
-
   #### Memcached ######
   memcached:
+    container_name: memcached
     build: ./memcached
     volumes:
       - ${DATA_PATH_HOST}/memcached:/var/lib/memcached
@@ -98,7 +104,6 @@ services:
       - php-fpm
     networks:
       - backend
-
 
   #### elasticsearch
   elasticsearch-m:
@@ -143,8 +148,9 @@ services:
       - frontend
       - backend
 
-## elasticsearch 可视化工具
+  ## elasticsearch 可视化工具
   kibana:
+    container_name: kibana
     image: kibana:7.3.0
     ports:
       - "5601:5601"
@@ -157,6 +163,7 @@ services:
 
   ###### swoole
   swoole:
+    container_name: swoole
     build: ./swoole
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
