@@ -1,0 +1,6 @@
+*
+!.gitignore
+!default.conf
+!defaultSSL.conf.example
+!swoole.conf
+!tp.conf
