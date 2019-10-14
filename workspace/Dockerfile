@@ -13,16 +13,16 @@ ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
 
 # Node /NVM
-ARG NODE_VERSION=node
-ENV NODE_VERSION ${NODE_VERSION}
-ARG NPM_REGISTRY=https://registry.npm.taobao.org
-ENV NPM_REGISTRY ${NPM_REGISTRY}
+ENV NODE_VERSION node
+ENV NPM_REGISTRY https://registry.npm.taobao.org
 ENV NVM_DIR /home/dnmp/.nvm
+ENV NVM_VERSION v0.35.0
 
 # composer 
 ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 
 RUN apt-get update -yqq \
+	&& apt-get install unzip \
 	&& pecl channel-update pecl.php.net \
 	&& groupadd -g ${PGID} dnmp \
 	&& useradd -u ${PUID} -g dnmp -m dnmp -G docker_env \
@@ -42,7 +42,7 @@ RUN composer global install \
 	&& echo "" >> ~/.bashrc \
 	&& echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash \
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh | bash \
 	&& . $NVM_DIR/nvm.sh \
 	&& nvm install ${NODE_VERSION} \
 	&& nvm alias default ${NODE_VERSION} \
