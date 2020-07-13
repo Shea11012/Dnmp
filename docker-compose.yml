@@ -94,17 +94,17 @@ services:
       - backend
 
   #### Memcached ######
-  memcached:
-    container_name: memcached
-    build: ./memcached
-    volumes:
-      - ${DATA_PATH_HOST}/memcached:/var/lib/memcached
-    ports:
-      - '${MEMCACHED_HOST_PORT}:11211'
-    depends_on:
-      - php-fpm
-    networks:
-      - backend
+  #   memcached:
+  #     container_name: memcached
+  #     build: ./memcached
+  #     volumes:
+  #       - ${DATA_PATH_HOST}/memcached:/var/lib/memcached
+  #     ports:
+  #       - '${MEMCACHED_HOST_PORT}:11211'
+  #     depends_on:
+  #       - php-fpm
+  #     networks:
+  #       - backend
 
   #### elasticsearch
   # elasticsearch-m:
@@ -175,14 +175,14 @@ services:
     tty: true
     entrypoint: ['bash']
   ##### C
-  gdbserver:
-    build: ./C
-    image: clion_dev
-    container_name: c_debug
-    ports:
-      - '7776:22'
-      - '7777:7777'
-    volumes:
-      - ${APP_CODE_PATH_HOST}/c:/home/debugger/clion_dev
-    working_dir: /home/debugger/clion_dev
-    hostname: debug
+#   gdbserver:
+#     build: ./C
+#     image: clion_dev
+#     container_name: c_debug
+#     ports:
+#       - '7776:22'
+#       - '7777:7777'
+#     volumes:
+#       - ${APP_CODE_PATH_HOST}/c:/home/debugger/clion_dev
+#     working_dir: /home/debugger/clion_dev
+#     hostname: debug

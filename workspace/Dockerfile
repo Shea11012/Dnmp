@@ -1,4 +1,4 @@
-FROM laradock/workspace:2.2-7.2
+FROM laradock/workspace:latest-7.3
 
 USER root
 
@@ -13,12 +13,12 @@ ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
 
 # Node /NVM
-ENV NODE_VERSION node
-ENV NPM_REGISTRY https://registry.npm.taobao.org
-ENV NVM_DIR /home/dnmp/.nvm
-ENV NVM_VERSION v0.35.0
+ARG NODE_VERSION=v12.13.1
+ARG NPM_REGISTRY=https://registry.npm.taobao.org
+ARG NVM_DIR=/home/dnmp/.nvm
+ARG NVM_VERSION=v0.35.3
 
-# composer 
+# composer
 ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 
 RUN apt-get update -yqq \
@@ -42,7 +42,7 @@ RUN composer global install \
 	&& echo "" >> ~/.bashrc \
 	&& echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
 
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh | bash \
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash \
 	&& . $NVM_DIR/nvm.sh \
 	&& nvm install ${NODE_VERSION} \
 	&& nvm alias default ${NODE_VERSION} \
@@ -52,16 +52,14 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/ins
 	&& echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc \
 	&& echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
-USER root
-
 RUN echo "" >> ~/.bashrc \
 	&& echo 'export NVM_DIR="/home/dnmp/.nvm"' >> ~/.bashrc \
 	&& echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc
 
 ENV PATH $PATH:$NVM_DIR/versions/node/v${NODE_VERSION}/bin
 
-RUN . ~/.bashrc && npm config set registry ${NPM_REGISTRY} \
-	&& apt-get clean \
+USER root
+RUN apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 	&& rm /var/log/lastlog /var/log/faillog
 

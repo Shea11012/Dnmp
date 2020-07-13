@@ -1,4 +1,4 @@
-FROM php:7.3.8-fpm
+FROM php:7.4.7-fpm
 
 ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
@@ -32,17 +32,15 @@ COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # mb_string,pdo,zip....
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include/ \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 	&& docker-php-ext-install gd \
 	&& docker-php-ext-install pcntl \
 	&& docker-php-ext-install intl \
 	&& docker-php-ext-install soap \
 	&& docker-php-ext-install xsl \
-	&& docker-php-ext-install wddx \
 	&& docker-php-ext-install zip \
 	&& docker-php-ext-install pdo_mysql \
 	&& docker-php-ext-install mysqli \
-	&& docker-php-ext-install mbstring \
 	&& docker-php-ext-install exif \
 	&& docker-php-ext-install bcmath \
 	&& docker-php-ext-install calendar \
