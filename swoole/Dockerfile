@@ -1,4 +1,4 @@
-FROM php:7.3.19-cli
+FROM php:7.4.9-cli-buster
 
 # Version
 #ARG PHPREDIS_VERSION=5.0.2

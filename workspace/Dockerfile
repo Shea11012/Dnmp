@@ -2,6 +2,10 @@ FROM laradock/workspace:latest-7.3
 
 USER root
 
+# switch apt sources to mirrors.aliyun.com
+RUN sed -i 's!archive.ubuntu.com!mirrors.aliyun.com!g' /etc/apt/sources.list
+RUN sed -i 's!security.ubuntu.com!mirrors.aliyun.com!g' /etc/apt/sources.list
+
 # add a non-root user
 ARG PUID=1000
 ENV PUID=${PUID}
@@ -13,7 +17,7 @@ ARG TZ=Asia/Shanghai
 ENV TZ ${TZ}
 
 # Node /NVM
-ARG NODE_VERSION=v12.13.1
+ARG NODE_VERSION=v14.7.0
 ARG NPM_REGISTRY=https://registry.npm.taobao.org
 ARG NVM_DIR=/home/dnmp/.nvm
 ARG NVM_VERSION=v0.35.3
