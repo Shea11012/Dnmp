@@ -26,6 +26,7 @@ RUN apt-get update \
 	libjpeg-dev \
 	libpng-dev \
 	libfreetype6-dev \
+	librabbitmq-dev \
 	&& groupadd -g 1000 dnmp \
 	&& useradd -u 1000 -g dnmp -m dnmp \
 	&& usermod -p "*" dnmp
@@ -39,7 +40,10 @@ RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
 # PHP extension
 RUN docker-php-ext-install \
-	bcmath gd pdo_mysql mbstring sockets zip sysvmsg sysvsem sysvshm
+	bcmath gd pdo_mysql mbstring sockets zip sysvmsg sysvsem sysvshm \
+	# amqp
+	&& pecl install amqp \
+	&& docker-php-ext-install
 
 # Redis extension
 # RUN wget http://pecl.php.net/get/redis-${PHPREDIS_VERSION}.tgz -O /tmp/redis.tar.tgz \

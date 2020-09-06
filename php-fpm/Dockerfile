@@ -1,6 +1,7 @@
 FROM php:7.4.7-fpm
 
 ARG TZ=Asia/Shanghai
+ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 ENV TZ ${TZ}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -8,7 +9,7 @@ COPY ./sources.list /etc/apt/sources.list
 
 RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-recommends  \
 	libssl-dev libicu-dev libmemcached-dev libz-dev libpq-dev libjpeg-dev libpng-dev libfreetype6-dev \
-	libmcrypt-dev libzip-dev zip unzip libxml2-dev libxslt-dev \
+	libmcrypt-dev libzip-dev zip unzip libxml2-dev libxslt-dev librabbitmq-dev \
 	&& pecl channel-update pecl.php.net \
 	&& apt-get install -yqq \
 	# PHP Redis Extension
@@ -26,10 +27,20 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-r
 	&& docker-php-ext-install opcache \
 	# xdebug
 	&& pecl install xdebug \
-	&& docker-php-ext-enable xdebug
+	&& docker-php-ext-enable xdebug \
+	# amqp
+	&& pecl install amqp \
+	&& docker-php-ext-enable amqp
 
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+# Composer
+RUN curl -sfL https://getcomposer.org/installer | php -- --install-dir="/usr/bin" --filename=composer \
+	&& chmod +x "/usr/bin/composer" \
+	&& composer self-update --clean-backups
+
+RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
 # mb_string,pdo,zip....
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \

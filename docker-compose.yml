@@ -93,6 +93,26 @@ services:
     networks:
       - backend
 
+  #### rabbitmq ######
+  rabbitmq:
+    container_name: rabbitmq
+    build: ./rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+      - '15671:15671'
+    privileged: true
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    hostname: dnmp-rabbitmq
+    volumes:
+      - ${DATA_PATH_HOST}/rabbitmq:/var/lib/rabbitmq
+    depends_on:
+      - php-fpm
+    networks:
+      - backend
+
   #### Memcached ######
   #   memcached:
   #     container_name: memcached
