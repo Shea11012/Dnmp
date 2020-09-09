@@ -7,6 +7,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./sources.list /etc/apt/sources.list
 
+RUN groupadd -g 1000 dnmp \
+	&& useradd -u 1000 -g dnmp -m dnmp \
+	&& usermod -p "*" dnmp
+
 RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-recommends  \
 	libssl-dev libicu-dev libmemcached-dev libz-dev libpq-dev libjpeg-dev libpng-dev libfreetype6-dev \
 	libmcrypt-dev libzip-dev zip unzip libxml2-dev libxslt-dev librabbitmq-dev \
@@ -40,8 +44,10 @@ RUN curl -sfL https://getcomposer.org/installer | php -- --install-dir="/usr/bin
 	&& chmod +x "/usr/bin/composer" \
 	&& composer self-update --clean-backups
 
+USER dnmp
 RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
+USER root
 # mb_string,pdo,zip....
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 	&& docker-php-ext-install gd \
@@ -66,8 +72,7 @@ COPY ./www.conf /usr/local/etc/php-fpm.d/
 
 RUN apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-	&& rm /var/log/lastlog /var/log/faillog \
-	&& usermod -u 1000 www-data
+	&& rm /var/log/lastlog /var/log/faillog
 
 WORKDIR /var/www
 

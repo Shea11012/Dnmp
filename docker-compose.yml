@@ -24,7 +24,7 @@ services:
     build:
       context: ./php-fpm
     volumes:
-      - ./php-fpm/php7.3.ini:/usr/local/etc/php/php.ini
+      - ./php-fpm/php7.4.ini:/usr/local/etc/php/php.ini
       - ${PHP_FPM_LOG_PATH}:/var/log/php:rw
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
     expose:
