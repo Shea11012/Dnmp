@@ -38,6 +38,7 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-r
 
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+COPY ./www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Composer
 RUN curl -sfL https://getcomposer.org/installer | php -- --install-dir="/usr/bin" --filename=composer \
