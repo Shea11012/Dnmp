@@ -1,21 +1,21 @@
-FROM php:7.4.7-fpm
+FROM php:7.4.11-fpm-alpine
 
 ARG TZ=Asia/Shanghai
 ARG COMPOSER_REPO_PACKAGIST=https://mirrors.aliyun.com/composer/
 ENV TZ ${TZ}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-COPY ./sources.list /etc/apt/sources.list
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
-RUN groupadd -g 1000 dnmp \
-	&& useradd -u 1000 -g dnmp -m dnmp \
-	&& usermod -p "*" dnmp
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-recommends  \
-	libssl-dev libicu-dev libmemcached-dev libz-dev libpq-dev libjpeg-dev libpng-dev libfreetype6-dev \
-	libmcrypt-dev libzip-dev zip unzip libxml2-dev libxslt-dev librabbitmq-dev \
+RUN addgroup -g 1000 dnmp \
+	&& adduser -G dnmp -u 1000 -D dnmp
+
+RUN apk update --no-cache && apk upgrade --no-cache && apk add --no-cache bash ${PHPIZE_DEPS} \
+	libressl-dev icu-dev libmemcached-dev zlib-dev postgresql-dev libpng-dev libjpeg-turbo-dev \
+	freetype-dev \
+	libzip-dev zip unzip libxml2-dev rabbitmq-c-dev \
 	&& pecl channel-update pecl.php.net \
-	&& apt-get install -yqq \
 	# PHP Redis Extension
 	&& pecl install redis \
 	&& docker-php-ext-enable redis \
@@ -41,14 +41,13 @@ COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 COPY ./www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Composer
-RUN curl -sfL https://getcomposer.org/installer | php -- --install-dir="/usr/bin" --filename=composer \
-	&& chmod +x "/usr/bin/composer" \
-	&& composer self-update --clean-backups
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 USER dnmp
 RUN composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST}
 
 USER root
+RUN apk add --no-cache libxslt-dev gettext-dev
 # mb_string,pdo,zip....
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 	&& docker-php-ext-install gd \
@@ -71,9 +70,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 
 COPY ./www.conf /usr/local/etc/php-fpm.d/
 
-RUN apt-get clean \
-	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-	&& rm /var/log/lastlog /var/log/faillog
+RUN rm -rf /tmp/*
 
 WORKDIR /var/www
 
